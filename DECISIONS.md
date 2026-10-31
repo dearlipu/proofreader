@@ -1,0 +1,4 @@
+- Used Vite + React + TypeScript as the required stack and kept the app static-first for GitHub Pages deployment.
+- Kept the core scheduler pure and browser-independent to satisfy the testability requirement and future FSRS replacement.
+- Chose a lightweight paper-and-ink visual system instead of a generic dashboard template to align with the proofreader desk direction.
+- Implemented the error classifier as a pure TS utility without DOM responsibilities so it can run in both UI and tests.
