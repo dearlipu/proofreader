@@ -2,3 +2,4 @@
 - Kept the core scheduler pure and browser-independent to satisfy the testability requirement and future FSRS replacement.
 - Chose a lightweight paper-and-ink visual system instead of a generic dashboard template to align with the proofreader desk direction.
 - Implemented the error classifier as a pure TS utility without DOM responsibilities so it can run in both UI and tests.
+- Used a simple Dexie schema with words, wordState, reviews, sessions, and settings tables so spaced-repetition data can be stored and queried without a backend.
