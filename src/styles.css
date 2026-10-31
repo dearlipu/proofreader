@@ -36,7 +36,7 @@ body {
   font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
   line-height: 1.5;
 }
-button, input { font: inherit; }
+button, input, select { font: inherit; }
 button {
   border: 1px solid var(--border);
   background: transparent;
@@ -44,6 +44,19 @@ button {
   border-radius: 0.5rem;
   padding: 0.7rem 1rem;
   cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+button:hover:not(:disabled) {
+  border-color: var(--ink-blue);
+  transform: translateY(-1px);
+}
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid var(--marker-yellow);
+  outline-offset: 3px;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 button.primary-action {
   background: var(--ink-blue);
@@ -63,10 +76,11 @@ button.primary-action {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
 }
-.topbar nav {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.desk-note {
+  margin: 0;
+  color: var(--muted);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
 }
 .eyebrow {
   margin: 0 0 0.2rem;
@@ -86,8 +100,15 @@ h1, h2, h3 {
 .progress-line {
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, var(--ink-blue) 0%, var(--ink-blue) 25%, rgba(45,78,134,0.15) 25%, rgba(45,78,134,0.15) 100%);
+  background: rgba(45, 78, 134, 0.15);
   border-radius: 999px;
+  overflow: hidden;
+}
+.progress-line span {
+  display: block;
+  height: 100%;
+  background: var(--ink-blue);
+  transition: width 180ms ease;
 }
 .session-card {
   margin-top: 1.5rem;
@@ -100,6 +121,134 @@ h1, h2, h3 {
 .session-card p {
   color: var(--muted);
 }
+.mode-picker, .add-word-form label, .answer-form label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.mode-picker {
+  max-width: 22rem;
+  margin: 1.5rem 0 1rem;
+}
+input, select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  background: var(--bg);
+  color: var(--text);
+}
+.text-action {
+  display: block;
+  margin-top: 0.8rem;
+  border-color: transparent;
+  padding-left: 0;
+  color: var(--ink-blue);
+}
+.add-word-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 32rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.optional-label {
+  color: var(--muted);
+  font-size: 0.82em;
+  font-weight: 400;
+}
+.session-progress {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.session-progress .text-action {
+  margin: 0;
+}
+.practice-card {
+  width: 100%;
+  max-width: 680px;
+}
+.practice-card h2 {
+  margin-bottom: 1.25rem;
+}
+.study-word {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+.study-word strong, .covered-word, .correct-spelling {
+  color: var(--text);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+}
+.covered-word {
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+.prompt-block {
+  margin: 1rem 0 1.5rem;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+.pattern-tags, .word-chunks {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.recognition-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.answer-form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 28rem;
+}
+.answer-form .primary-action {
+  justify-self: start;
+}
+.answer-review {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.correct-spelling {
+  margin: 0.3rem 0 0.8rem;
+}
+.detected-patterns {
+  margin: 0.6rem 0 0;
+  color: var(--proof-red);
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+.red-pencil-diff {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.outcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+.error-message {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--proof-red);
+  background: var(--panel);
+  color: var(--text);
+}
 @media (max-width: 640px) {
   .topbar {
     flex-direction: column;
@@ -107,5 +256,16 @@ h1, h2, h3 {
   }
   .session-card {
     padding: 1.25rem;
+  }
+  .session-progress {
+    grid-template-columns: 1fr auto;
+  }
+  .session-progress .text-action {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .outcome-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

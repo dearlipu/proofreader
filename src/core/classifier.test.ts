@@ -54,6 +54,12 @@ describe('classifyError', () => {
     expect(diff.svg).toContain('aria-label="red-pencil diff"');
   });
 
+  it('escapes user text in the SVG diff', () => {
+    const diff = buildRedPencilDiff('a', '<');
+    expect(diff.svg).toContain('&lt;');
+    expect(diff.svg).not.toContain('><</text>');
+  });
+
   it('keeps a matching answer as a no-op', () => {
     expect(classifyError('receive', 'receive')).toEqual([]);
   });

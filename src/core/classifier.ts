@@ -21,6 +21,15 @@ function normalize(value: string): string {
   return value.trim().toLowerCase();
 }
 
+function escapeSvgText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 const PREFIXES = ['re', 'un', 'in', 'dis', 'over', 'out', 'up', 'pre'];
 const KEYBOARD_NEIGHBORS: Record<string, string[]> = {
   q: ['w'],
@@ -361,27 +370,27 @@ export function buildRedPencilDiff(target: string, answer: string): RedPencilDif
 
     if (!targetChar && answerChar) {
       pieces.push(
-        `<g transform="translate(${index * 18}, 0)"><text x="0" y="20" fill="#d2402a" font-size="18" font-family="IBM Plex Mono, monospace">${answerChar}</text><path d="M0 18 L12 18" stroke="#d2402a" stroke-width="2"/></g>`
+        `<g transform="translate(${index * 18}, 0)"><text x="0" y="20" fill="#d2402a" font-size="18" font-family="IBM Plex Mono, monospace">${escapeSvgText(answerChar)}</text><path d="M0 18 L12 18" stroke="#d2402a" stroke-width="2"/></g>`
       );
       continue;
     }
 
     if (targetChar && !answerChar) {
       pieces.push(
-        `<g transform="translate(${index * 18}, 0)"><text x="0" y="20" fill="#17181b" font-size="18" font-family="IBM Plex Mono, monospace" text-decoration="line-through">${targetChar}</text><path d="M0 15 L12 15" stroke="#d2402a" stroke-width="2"/><text x="6" y="8" fill="#d2402a" font-size="12" font-family="IBM Plex Mono, monospace">^</text></g>`
+        `<g transform="translate(${index * 18}, 0)"><text x="0" y="20" fill="#17181b" font-size="18" font-family="IBM Plex Mono, monospace" text-decoration="line-through">${escapeSvgText(targetChar)}</text><path d="M0 15 L12 15" stroke="#d2402a" stroke-width="2"/><text x="6" y="8" fill="#d2402a" font-size="12" font-family="IBM Plex Mono, monospace">^</text></g>`
       );
       continue;
     }
 
     if (targetChar === answerChar) {
       pieces.push(
-        `<text x="${index * 18}" y="20" fill="#17181b" font-size="18" font-family="IBM Plex Mono, monospace">${targetChar}</text>`
+        `<text x="${index * 18}" y="20" fill="#17181b" font-size="18" font-family="IBM Plex Mono, monospace">${escapeSvgText(targetChar)}</text>`
       );
       continue;
     }
 
     pieces.push(
-      `<g transform="translate(${index * 18}, 0)"><text x="0" y="20" fill="#d2402a" font-size="18" font-family="IBM Plex Mono, monospace" text-decoration="line-through">${targetChar}</text><text x="12" y="8" fill="#2d4e86" font-size="12" font-family="IBM Plex Mono, monospace">${answerChar}</text><path d="M2 15 Q6 8 10 15" stroke="#d2402a" stroke-width="2" fill="none"/></g>`
+      `<g transform="translate(${index * 18}, 0)"><text x="0" y="20" fill="#d2402a" font-size="18" font-family="IBM Plex Mono, monospace" text-decoration="line-through">${escapeSvgText(targetChar)}</text><text x="12" y="8" fill="#2d4e86" font-size="12" font-family="IBM Plex Mono, monospace">${escapeSvgText(answerChar)}</text><path d="M2 15 Q6 8 10 15" stroke="#d2402a" stroke-width="2" fill="none"/></g>`
     );
   }
 
