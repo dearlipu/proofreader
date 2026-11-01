@@ -549,7 +549,7 @@ export default function App() {
   const persistSession = async () => {
     const endedAt = Date.now();
     const finalProgress = progressRef.current;
-    const total = finalProgress.correct + finalProgress.incorrect;
+    const total = finalProgress.correct + finalProgress.incorrect + finalProgress.slips;
     const record: SessionRecord = {
       id: sessionId.current,
       startedAt: new Date(sessionStartedAt).toISOString(),
