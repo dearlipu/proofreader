@@ -6,3 +6,6 @@
 - M4 uses a single recall mode per session. This keeps prompts consistent while preserving the selected mode and technique on each review record.
 - A wrong response is not scheduled until the learner labels it as a slip or a knowledge miss. Slips preserve the scheduler state and do not increase lapses; their attempts remain recorded separately from accuracy.
 - Keystroke timing stores response latency plus inter-key intervals, not raw key values. Dictation playback begins on an explicit user action so speech is never unsolicited.
+- M7 rotates the learner’s active technique by tracking the method used on each review and surfacing the strongest-performing method in a “What works for you” summary. This avoids hard-coding a single study routine and gives the desk a personalized cue when a word keeps missing.
+- M8 keeps reading comfort as a persistent desk setting rather than a one-off theme toggle. Text size, line spacing, high-contrast mode, and reduced-motion mode are stored in the same settings table as onboarding state so the desk stays comfortable across sessions.
+- M9 adds seed packs and desk export/import so the learner can quickly start with curated words and move their word list between installations without owning a backend. Seed data is plain JSON and is merged into the local Dexie database without overriding existing words.

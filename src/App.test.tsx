@@ -58,6 +58,110 @@ describe('practice session', () => {
     expect(state?.status).toBe('WEAK');
   });
 
+  it('shows a technique recommendation and stores the learner’s selected ritual', async () => {
+    await seedWord();
+    render(<App />);
+
+    await screen.findByRole('button', { name: /Start session/ });
+    fireEvent.change(screen.getByLabelText('Practice mode'), { target: { value: 'meaning' } });
+    fireEvent.click(screen.getByRole('button', { name: /Start session/ }));
+
+    expect(await screen.findByText('Hear the word before you type it.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Common habits to revisit' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Ways to approach a miss' })).not.toBeInTheDocument();
+    expect(screen.queryByText('What works for you')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Command palette' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: 'Main navigation' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+    expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Drawers' }));
+    expect(await screen.findByRole('heading', { name: 'Common habits to revisit' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Ways to approach a miss' })).toBeInTheDocument();
+    expect(await screen.findByText('What works for you')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Today' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pattern first' }));
+    fireEvent.change(screen.getByLabelText('Your spelling'), { target: { value: 'apple' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check spelling' }));
+
+    await waitFor(async () => {
+      const review = await db.reviews.toCollection().first();
+      expect(review).toMatchObject({ technique: 'pattern-first', correct: true });
+    });
+  });
+
+  it('persists reading comfort selections for the desk', async () => {
+    render(<App />);
+
+    await screen.findByRole('button', { name: 'Open navigation menu' });
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Desk' }));
+    fireEvent.click(screen.getByRole('button', { name: 'A+' }));
+    fireEvent.click(screen.getByLabelText('High contrast'));
+
+    await waitFor(async () => {
+      const settings = await db.settings.get('readingComfort');
+      expect(settings).toMatchObject({
+        key: 'readingComfort',
+        value: expect.objectContaining({ fontScale: 1.15, highContrast: true }),
+      });
+    });
+  });
+
+  it('adds a curated seed pack to the desk', async () => {
+    render(<App />);
+
+    await screen.findByRole('button', { name: 'Open navigation menu' });
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Desk' }));
+    fireEvent.click(screen.getByRole('button', { name: /Add everyday words pack/i }));
+
+    await waitFor(async () => {
+      const stored = await db.words.get('because');
+      expect(stored).toMatchObject({ pack: 'everyday-words', text: 'because' });
+    });
+  });
+
+  it('shows a progress snapshot in the today view', async () => {
+    await db.reviews.put({
+      id: 'review-1',
+      wordId: word.id,
+      at: new Date().toISOString(),
+      mode: 'meaning',
+      prompt: word.meaning,
+      response: word.text,
+      correct: true,
+      latencyMs: 300,
+      keystrokes: [100],
+      hintUsed: false,
+      slipFlag: false,
+      errorTypes: [],
+      technique: 'say-it-aloud',
+    });
+
+    render(<App />);
+
+    expect(await screen.findByText('Progress')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Desk momentum' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /words in the desk/ })).not.toBeInTheDocument();
+    const dateLabel = screen.getByText(/^\d{2} [A-Z]+ \d{2}$/);
+    const todayCard = dateLabel.closest('article');
+    expect(dateLabel).toBeInTheDocument();
+    expect(todayCard?.querySelector('.overview-card-heading')?.contains(dateLabel)).toBe(true);
+    expect(todayCard?.querySelector('.today-summary')?.children).toHaveLength(3);
+    expect(todayCard?.querySelector('.today-summary')?.previousElementSibling).toBe(
+      todayCard?.querySelector('.overview-card-heading'),
+    );
+    expect(screen.getByText('Today’s reviews')).toBeInTheDocument();
+    expect(screen.getByText('1 done · 0 due')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'Today’s review progress' })).toHaveAttribute('aria-valuenow', '100');
+    expect(screen.getByRole('heading', { name: 'Proofreader' })).toBeInTheDocument();
+    expect(screen.queryByText('Spelling practice')).not.toBeInTheDocument();
+    expect(screen.getByText('100%')).toBeInTheDocument();
+    expect(screen.getByText('1 days')).toBeInTheDocument();
+  });
+
   it('lets the learner mark a typo as a slip without a lapse', async () => {
     await seedWord();
     render(<App />);
